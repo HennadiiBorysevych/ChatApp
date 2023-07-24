@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ScrollToBotton from "react-scroll-to-bottom";
-
+import { nanoid } from "nanoid";
 const Chat = ({ socket, username, room }) => {
   const [currentMessage, setCurrentMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
@@ -8,7 +8,7 @@ const Chat = ({ socket, username, room }) => {
   const sendMessage = async () => {
     if (currentMessage !== "") {
       const messageData = {
-        room,
+        room: room,
         author: username,
         message: currentMessage,
         time:
@@ -16,6 +16,7 @@ const Chat = ({ socket, username, room }) => {
           ":" +
           new Date(Date.now()).getMinutes(),
       };
+
       await socket.emit("send_message", messageData);
       setMessageList((list) => [...list, messageData]);
       setCurrentMessage("");
@@ -24,6 +25,7 @@ const Chat = ({ socket, username, room }) => {
 
   useEffect(() => {
     socket.on("recieve_message", (data) => {
+      console.log("🚀 : data", data);
       setMessageList((list) => [...list, data]);
     });
   }, [socket]);
@@ -38,6 +40,7 @@ const Chat = ({ socket, username, room }) => {
           {messageList.map((messageContent) => {
             return (
               <div
+                key={nanoid()}
                 className="message"
                 id={username === messageContent.author ? "you" : "other"}
               >
